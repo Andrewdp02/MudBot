@@ -1,0 +1,36 @@
+# Environment variables
+.env
+
+# Logs
+*.log
+meme_generator.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Generated images (optional - remove if you want to keep them in git)
+# Uncomment the following lines if you don't want to commit generated memes
+# *.jpg
+# *.jpeg
+# *.png
+# *.gif
+# coffee memes/
