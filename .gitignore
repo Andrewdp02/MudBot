@@ -27,10 +27,12 @@ ENV/
 .DS_Store
 Thumbs.db
 
+
+
 # Generated images (optional - remove if you want to keep them in git)
 # Uncomment the following lines if you don't want to commit generated memes
-# *.jpg
-# *.jpeg
-# *.png
-# *.gif
-# coffee memes/
+*.jpg
+*.jpeg
+*.png
+*.gif
+coffee memes/
