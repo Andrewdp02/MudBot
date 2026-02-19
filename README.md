@@ -2,7 +2,7 @@
 
 A Python script that automatically generates coffee memes using AI and sends them to your email. Perfect for daily coffee humor!
 
-   ![Coffee meme](coffee_ad.jpg)
+   ![Coffee meme](mudbot_ad.jpg)
 
 ## Features
 
