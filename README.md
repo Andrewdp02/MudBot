@@ -2,6 +2,8 @@
 
 A Python script that automatically generates coffee memes using AI and sends them to your email. Perfect for daily coffee humor!
 
+   ![Coffee meme](coffee_ad.jpg)
+
 ## Features
 
 - 🤖 **AI-Powered**: Generates meme captions and images using **OpenAI** (GPT + gpt-image-1 or DALL-E 3) or **Grok** (xAI)
