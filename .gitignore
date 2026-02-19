@@ -29,8 +29,7 @@ Thumbs.db
 
 
 
-# Generated images (optional - remove if you want to keep them in git)
-# Uncomment the following lines if you don't want to commit generated memes
+# Generated images
 *.jpg
 *.jpeg
 *.png

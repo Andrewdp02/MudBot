@@ -6,6 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from config import Config
 from openai_service import OpenAIService
+from grok_service import GrokService
 from image_processor import ImageProcessor
 from email_service import EmailService
 
@@ -37,18 +38,25 @@ def main():
         
         # Initialize services
         logger.info("Initializing services...")
-        openai_service = OpenAIService()
+        if Config.AI_PROVIDER == "grok":
+            ai_service = GrokService()
+            logger.info("Using Grok (xAI) image model only for meme generation")
+        else:
+            ai_service = OpenAIService()
+            logger.info("Using OpenAI for text and image generation")
         email_service = EmailService()
         logger.info("Services initialized successfully")
         
-        # Step 1a: Generate meme text
-        logger.info("Step 1a: Generating meme text...")
-        meme_text = openai_service.generate_meme_text()
-        logger.info(f"Meme text: {meme_text!r}")
-        
-        # Step 1b: Generate meme image with that text
-        logger.info("Step 1b: Generating coffee meme image with caption...")
-        image_bytes = openai_service.generate_meme_image(meme_text)
+        # Step 1: Generate meme image (Grok: image only; OpenAI: text then image)
+        if Config.AI_PROVIDER == "grok":
+            logger.info("Step 1: Generating coffee meme image (Grok)...")
+            image_bytes = ai_service.generate_meme_image()
+        else:
+            logger.info("Step 1a: Generating meme text...")
+            meme_text = ai_service.generate_meme_text()
+            logger.info(f"Meme text: {meme_text!r}")
+            logger.info("Step 1b: Generating coffee meme image with caption...")
+            image_bytes = ai_service.generate_meme_image(meme_text)
         logger.info(f"Image generated: {len(image_bytes)} bytes")
         
         # Step 2: Process image for email (optional, but helps with size)

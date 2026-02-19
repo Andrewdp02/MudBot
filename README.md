@@ -4,18 +4,18 @@ A Python script that automatically generates coffee memes using AI and sends the
 
 ## Features
 
-- 🤖 **AI-Powered**: Uses OpenAI's DALL-E 3 to generate coffee meme images with captions
-- 🎨 **Image Generation**: Creates coffee-themed meme images with text in one step
-- 📧 **Email Delivery**: Sends memes directly to your email (can forward to group chats!)
+- 🤖 **AI-Powered**: Generates meme captions and images using **OpenAI** (GPT + gpt-image-1 or DALL-E 3) or **Grok** (xAI)
+- 🎨 **Two-Step Generation**: First generates funny text, then creates a coffee meme image that displays that exact text
+- 📧 **Email Delivery**: Sends memes directly to your email (forward to group chats or use the iPhone automation below)
 - ⏰ **Automated**: Can be scheduled to run daily using Windows Task Scheduler
 - 🖼️ **Auto-Optimization**: Automatically resizes and compresses images for email compatibility
 
 ## Prerequisites
 
 - Python 3.8 or higher
-- OpenAI API account and key
+- **Either** an OpenAI API account and key **or** an xAI (Grok) API account and key
 - Email account (Gmail, Outlook, or any SMTP-compatible email)
-- (Optional) ImgBB API key - no longer required for email, but kept for potential future use
+- (Optional) ImgBB / Imgur API keys for image hosting—not required for email delivery
 
 ## Setup Instructions
 
@@ -33,13 +33,23 @@ pip install -r requirements.txt
 
 ### 3. Get API Keys
 
-#### OpenAI API Key
+Choose one AI provider (OpenAI or Grok). You only need the API key for the provider you use.
+
+#### OpenAI API Key (when using OpenAI)
 
 1. Go to [OpenAI Platform](https://platform.openai.com/)
 2. Sign up or log in
 3. Navigate to [API Keys](https://platform.openai.com/api-keys)
 4. Click "Create new secret key"
 5. Copy the key (you won't be able to see it again!)
+
+#### Grok / xAI API Key (when using Grok)
+
+1. Go to [xAI](https://x.ai/) and sign up or log in
+2. Open the [xAI API Console](https://console.x.ai/)
+3. Go to [API Keys](https://console.x.ai/team/default/api-keys)
+4. Create a new API key and copy it
+5. Ensure your account has credits (new users may receive free credits)
 
 #### Email Account Setup
 
@@ -77,8 +87,14 @@ The script sends memes via email, which you can then forward to group chats or a
 2. Copy the contents from `.env.example` (if it exists) or use this template:
 
 ```env
-# OpenAI API Configuration
+# AI Provider: "openai" or "grok" (default: openai)
+AI_PROVIDER=openai
+
+# OpenAI API (required when AI_PROVIDER=openai)
 OPENAI_API_KEY=sk-your-openai-api-key-here
+
+# Grok / xAI API (required when AI_PROVIDER=grok)
+XAI_API_KEY=your-xai-api-key-here
 
 # Email Configuration
 SMTP_SERVER=smtp.gmail.com
@@ -88,29 +104,37 @@ EMAIL_ADDRESS=your-email@gmail.com
 EMAIL_PASSWORD=your-app-password-here
 RECIPIENT_EMAIL=recipient@example.com
 
-# Image Generation Settings (optional)
+# OpenAI image settings (when AI_PROVIDER=openai, optional)
+TEXT_MODEL=gpt-4o-mini
+OPENAI_MODEL=gpt-image-1
 IMAGE_SIZE=1024x1024
 IMAGE_QUALITY=low
 MAX_IMAGE_SIZE_MB=5.0
 
+# Grok image settings (when AI_PROVIDER=grok, optional)
+GROK_TEXT_MODEL=grok-2-latest
+GROK_IMAGE_MODEL=grok-imagine-image
+GROK_ASPECT_RATIO=1:1
+GROK_RESOLUTION=1k
+
 # Meme Style (optional)
 MEME_STYLE=funny
 
-# Image Hosting (optional - not needed for email, but kept for potential future use)
+# Image Hosting (optional - not needed for email)
 IMGBB_API_KEY=your_imgbb_api_key_here
 IMGUR_CLIENT_ID=your_imgur_client_id_here
 ```
 
 3. Replace all the placeholder values with your actual credentials:
-   - `OPENAI_API_KEY`: Your OpenAI API key
+   - `AI_PROVIDER`: Set to `openai` or `grok` (default: `openai`). **When OpenAI**: set `OPENAI_API_KEY`. **When Grok**: set `XAI_API_KEY`. Optional for Grok: `GROK_TEXT_MODEL`, `GROK_IMAGE_MODEL`, `GROK_ASPECT_RATIO`, `GROK_RESOLUTION`.
    - `SMTP_SERVER`: Your email provider's SMTP server (e.g., `smtp.gmail.com` for Gmail, `smtp-mail.outlook.com` for Outlook)
    - `SMTP_PORT`: SMTP port (usually `587` for TLS, `465` for SSL)
    - `SMTP_USE_TLS`: Set to `true` for TLS (port 587) or `false` for SSL (port 465)
    - `EMAIL_ADDRESS`: Your email address (the one sending the memes)
    - `EMAIL_PASSWORD`: Your email password or app password (see setup instructions above)
-   - `RECIPIENT_EMAIL`: Recipient email address(es) - use comma-separated list for multiple recipients
-   - `IMGBB_API_KEY`: (Optional) Not needed for email, but kept for potential future use
-   - `IMGUR_CLIENT_ID`: (Optional) Not needed for email, but kept for potential future use
+   - `RECIPIENT_EMAIL`: Recipient email address(es)—use comma-separated list for multiple recipients (e.g. your iPhone’s email for the automation below)
+   - OpenAI-only (optional): `TEXT_MODEL`, `OPENAI_MODEL`, `IMAGE_SIZE`, `IMAGE_QUALITY`
+   - `IMGBB_API_KEY` / `IMGUR_CLIENT_ID`: Optional; not needed for email
 
 **Important**: 
 - For Gmail, you must use an app password (not your regular password)
@@ -125,7 +149,7 @@ Run the script manually to make sure everything works:
 python meme_generator.py
 ```
 
-You should receive a coffee meme on your phone within a few minutes!
+You should receive a coffee meme at the configured email address within a few minutes. To have it auto-sent to a group chat on your iPhone, see [iPhone: Auto-Send Meme Email Attachment to a Group Chat](#iphone-auto-send-meme-email-attachment-to-a-group-chat).
 
 ## Setting Up Windows Task Scheduler
 
@@ -190,16 +214,84 @@ Register-ScheduledTask -TaskName "Daily Coffee Meme" -Action $action -Trigger $t
 
 1. In Task Scheduler, find your task
 2. Right-click and select "Run"
-3. Check your phone for the meme
+3. Check your email (and group chat if you use the iPhone automation below) for the meme
 4. Check the log file `meme_generator.log` for any errors
+
+## iPhone: Auto-Send Meme Email Attachment to a Group Chat
+
+You can use an **iPhone Shortcuts automation** so that when you receive the coffee meme email, the image attachment is automatically sent to a group chat (e.g. iMessage or WhatsApp). This uses the built-in **Shortcuts** app and **Automation** (triggered by email).
+
+### What you need
+
+- iPhone with the **Mail** app and **Shortcuts** (built in)
+- Your meme emails delivered to this iPhone (set `RECIPIENT_EMAIL` to your iPhone’s email, or forward to it)
+- The group chat created in Messages (or another app) so you can select it in the shortcut
+
+### Option A: Automation when an email is received
+
+1. **Create the shortcut first** (so you can attach it to the automation):
+   - Open **Shortcuts** → **Shortcuts** tab → **+** (New Shortcut).
+   - Add action **“Find Emails”**:
+     - Set **Account** to the mailbox that receives the meme emails.
+     - Set **Sender** to your `EMAIL_ADDRESS` (the address that sends the memes), or leave blank to use “most recent” from that account.
+     - Set **Limit** to **1** (only the latest matching email).
+   - Add action **“Get contents of”** (or **“Get File from Input”** / **“Get Attachments from Input”** depending on your iOS version—use the action that gives you the attachment from the email).
+   - If your version exposes **“Get attachments from Mail”** or **“Contents of Mail”** and then “Get first attachment”, use that to pass the image.
+   - Add action **“Send Message”**:
+     - **Recipients**: tap and choose your **group chat** (or contact).
+     - Leave message body blank or add a short line (e.g. “☕”); the **input** from the previous step should be attached as the image. If the action has “Input” or “Attachments”, pass the attachment there.
+   - Name the shortcut (e.g. **“Meme to group”**) and tap **Done**.
+
+2. **Create the automation**:
+   - In Shortcuts, open the **Automation** tab → **+** → **Create Personal Automation**.
+   - Choose **Email**:
+     - **Sender**: your `EMAIL_ADDRESS` (the meme sender).
+     - Optionally **Subject Contains**: e.g. `Coffee` or `Meme` if your email subject is consistent.
+     - **Account**: the mailbox where you receive the meme.
+   - Tap **Next** → **Add Action** → search for **“Run Shortcut”** → select the shortcut you created (e.g. **“Meme to group”**).
+   - Tap **Next** → turn **Ask Before Running** **off** if you want it to run without a prompt (otherwise you’ll tap “Run” when notified).
+   - Tap **Done**.
+
+After this, when a matching email arrives, the automation runs and the shortcut should get that email’s attachment and send it to the group. If your iOS version doesn’t pass the email automatically into “Find Emails”, the shortcut still runs and can find the latest email from that sender.
+
+### Option B: Manual shortcut (no automation)
+
+If automation is unreliable or you prefer to trigger it yourself:
+
+1. In **Shortcuts**, create a new shortcut.
+2. Add **Find Emails** (same sender/account as above, Limit 1).
+3. Add the action that gets the **attachment** from that email (e.g. “Get contents of” / “Get File from Input” / attachment from Mail).
+4. Add **Send Message** to your group chat and pass the attachment as input.
+5. Run the shortcut manually after you receive the meme email (e.g. from the Shortcuts widget or by asking Siri).
+
+### Notes
+
+- **Action names** can differ by iOS version (e.g. “Get contents of” vs “Get File from Input”). If you don’t see “Get attachments from Mail”, try “Find Emails” → “Get contents of” and see if the result includes the image, or search in the actions list for “attachment” or “Mail”.
+- **Ask Before Running**: With “Ask Before Running” on, you’ll get a notification when the email arrives; tap **Run** to send the attachment to the group.
+- **Subject line**: In your script, the email subject is set by `email_service`. If you use “Subject Contains” in the trigger, use a phrase that appears in that subject.
 
 ## Configuration Options
 
-### Image Settings
+### AI Provider
 
-- `IMAGE_SIZE`: Image dimensions. Options: `1024x1024`, `1792x1024`, `1024x1792` (default: `1024x1024`)
-- `IMAGE_QUALITY`: Image quality. Options: `standard` or `hd` (default: `standard`)
-- `MAX_IMAGE_SIZE_MB`: Maximum image size for email (default: `5.0` MB, most email providers support up to 25MB)
+- `AI_PROVIDER`: `openai` (default) or `grok`. Use `grok` to generate memes with xAI's Grok models (caption + grok-imagine-image).
+
+### OpenAI Image Settings (when AI_PROVIDER=openai)
+
+- `OPENAI_MODEL`: `gpt-image-1` (default), `gpt-image-1-mini`, `dall-e-3`, or `dall-e-2`. For gpt-image-1, sizes can be `1024x1024`, `1536x1024`, `1024x1536`; for DALL-E 3, `1024x1024`, `1792x1024`, `1024x1792`.
+- `IMAGE_SIZE`: Depends on model (see above). Default: `1024x1024`.
+- `IMAGE_QUALITY`: For gpt-image-1: `high`, `medium`, `low`, or `auto`. For DALL-E 3: `standard` or `hd`. Default in config: `low`.
+
+### Grok Settings (when AI_PROVIDER=grok)
+
+- `GROK_TEXT_MODEL`: Chat model for meme caption (e.g. `grok-2-latest`, `grok-3-mini`). Default: `grok-2-latest`.
+- `GROK_IMAGE_MODEL`: Image model (default: `grok-imagine-image`).
+- `GROK_ASPECT_RATIO`: `1:1`, `16:9`, `9:16`, `4:3`, `3:4`, `auto`, etc. Default: `1:1`.
+- `GROK_RESOLUTION`: `1k` or `2k`. Default: `1k`.
+
+### Other
+
+- `MAX_IMAGE_SIZE_MB`: Maximum image size for email (default: `5.0` MB).
 
 ### Meme Style
 
@@ -213,11 +305,18 @@ Register-ScheduledTask -TaskName "Daily Coffee Meme" -Action $action -Trigger $t
 - Check that all required variables are set (no empty values)
 - Verify there are no extra spaces or quotes around values
 
-### "OpenAI API error" or "Invalid API key"
+### "OpenAI API error" or "Invalid API key" (AI_PROVIDER=openai)
 
 - Verify your OpenAI API key is correct
 - Check that you have credits in your OpenAI account
 - Ensure your API key hasn't been revoked
+
+### Grok / xAI errors (AI_PROVIDER=grok)
+
+- Ensure `XAI_API_KEY` is set in `.env` and `AI_PROVIDER=grok`
+- Create or check your key at [xAI API Keys](https://console.x.ai/team/default/api-keys)
+- Confirm your xAI account has credits
+- If the text model name fails, try `grok-2-latest` or `grok-3-mini` (see [xAI models](https://docs.x.ai/docs/models))
 
 ### "Email error" or "Email not received"
 
@@ -262,13 +361,15 @@ The script creates a log file `meme_generator.log` in the project directory. Che
 
 ## Cost Considerations
 
-- **OpenAI API**: 
-  - DALL-E 3: ~$0.04 per image (standard), ~$0.08 per image (HD)
-  - Estimated daily cost: ~$0.04-0.08 per meme (no GPT call needed since caption is generated with image)
+- **OpenAI API** (when AI_PROVIDER=openai): 
+  - **Caption**: One short GPT call per meme (e.g. gpt-4o-mini), typically a fraction of a cent.
+  - **Image**: gpt-image-1 or DALL-E 3; pricing varies by model and quality. DALL-E 3 is roughly ~$0.04 (standard) or ~$0.08 (HD) per image. Check [OpenAI pricing](https://developers.openai.com/api/docs/pricing/) for current rates.
+  - Estimated daily cost: a few cents per meme depending on model and quality.
+- **Grok / xAI** (when AI_PROVIDER=grok): 
+  - **Caption**: One short Grok chat call per meme; pricing is token-based (see [xAI pricing](https://docs.x.ai/docs/models)).
+  - **Image**: grok-imagine-image uses per-image pricing. See [xAI models and pricing](https://docs.x.ai/docs/models) for current rates. New xAI accounts may receive free credits.
 - **Email**: 
-  - **Free!** Most email providers (Gmail, Outlook, etc.) offer free SMTP sending
-  - No API costs or per-message fees
-  - Perfect for daily automated memes
+  - **Free!** Most email providers (Gmail, Outlook, etc.) offer free SMTP sending—no per-message fees.
 
 ## License
 
@@ -279,7 +380,7 @@ This project is provided as-is for personal use.
 For issues or questions:
 1. Check the log file `meme_generator.log`
 2. Verify all API keys and email configuration
-3. Test each component individually (OpenAI, email settings)
+3. Test each component individually (OpenAI or Grok, email settings)
 4. Make sure you're using an app password for Gmail (not your regular password)
 
 Enjoy your daily coffee memes! ☕
